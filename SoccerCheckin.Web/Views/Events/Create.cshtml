@@ -1,0 +1,51 @@
+@model SoccerCheckin.Web.Models.Event
+@{
+    ViewData["Title"] = "New Event";
+    var program = (SoccerCheckin.Web.Models.Program?)ViewBag.Program;
+}
+<h1>New Event @(program == null ? "" : $"in {program.Name}")</h1>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@err.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+<form asp-action="Create" method="post" novalidate>
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="ProgramId" />
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" required />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="StartUtc" class="form-label">Start (local time)</label>
+        <input asp-for="StartUtc" type="datetime-local" class="form-control" asp-format="{0:yyyy-MM-ddTHH:mm}" required />
+        <span asp-validation-for="StartUtc" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Location" class="form-label"></label>
+        <input asp-for="Location" class="form-control" data-address-autocomplete autocomplete="off" />
+        <div class="form-text">Start typing an address — suggestions powered by OpenStreetMap.</div>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Create</button>
+    @if (program != null)
+    {
+        <a class="btn btn-secondary" asp-controller="Programs" asp-action="Details" asp-route-id="@program.Id">Cancel</a>
+    }
+</form>
+
+@section Scripts {
+    <script src="~/js/address-autocomplete.js" asp-append-version="true"></script>
+}

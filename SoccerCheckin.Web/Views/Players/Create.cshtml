@@ -1,0 +1,22 @@
+@model SoccerCheckin.Web.Models.Player
+@{
+    var program = (SoccerCheckin.Web.Models.Program)ViewBag.Program;
+    ViewData["Title"] = "Add Player";
+}
+<h1>Add Player to @program.Name</h1>
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="ProgramId" />
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Notes" class="form-label"></label>
+        <input asp-for="Notes" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Add</button>
+    <a class="btn btn-secondary" asp-action="Index" asp-route-programId="@program.Id">Cancel</a>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

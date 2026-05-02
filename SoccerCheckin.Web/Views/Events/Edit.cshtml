@@ -1,0 +1,34 @@
+@model SoccerCheckin.Web.Models.Event
+@{
+    ViewData["Title"] = "Edit Event";
+}
+<h1>Edit Event</h1>
+<form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="ProgramId" />
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="StartUtc" class="form-label">Start (local time)</label>
+        <input asp-for="StartUtc" type="datetime-local" class="form-control" asp-format="{0:yyyy-MM-ddTHH:mm}" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Location" class="form-label"></label>
+        <input asp-for="Location" class="form-control" data-address-autocomplete autocomplete="off" />
+        <div class="form-text">Start typing an address — suggestions powered by OpenStreetMap.</div>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a class="btn btn-secondary" asp-action="Details" asp-route-id="@Model.Id">Cancel</a>
+</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/address-autocomplete.js" asp-append-version="true"></script>
+}

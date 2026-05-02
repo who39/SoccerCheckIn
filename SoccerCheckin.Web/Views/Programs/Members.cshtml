@@ -1,0 +1,69 @@
+@model SoccerCheckin.Web.Models.Program
+@using SoccerCheckin.Web.Models
+@{
+    ViewData["Title"] = $"Members - {Model.Name}";
+}
+<h1>Members of @Model.Name</h1>
+
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-danger">@err</div>
+}
+
+<form asp-action="AddMember" asp-route-id="@Model.Id" method="post" class="row g-2 mb-4">
+    @Html.AntiForgeryToken()
+    <div class="col-md-6">
+        <input type="email" name="email" class="form-control" placeholder="user@example.com" required />
+    </div>
+    <div class="col-auto">
+        <select name="role" class="form-select">
+            <option value="@ProgramRole.Member" selected>Member</option>
+            <option value="@ProgramRole.Manager">Manager</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Add / Update</button>
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Display Name</th>
+            <th>Role</th>
+            <th>Assigned</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pu in Model.ProgramUsers.OrderBy(x => x.UserSession.MicrosoftEmail))
+        {
+            <tr>
+                <td>@pu.UserSession.MicrosoftEmail</td>
+                <td>@pu.UserSession.MicrosoftDisplayName</td>
+                <td>
+                    <form asp-action="SetMemberRole" asp-route-id="@Model.Id" method="post" class="d-flex gap-1">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="userSessionId" value="@pu.UserSessionId" />
+                        <select name="role" class="form-select form-select-sm">
+                            <option value="@ProgramRole.Member" selected="@(pu.Role == ProgramRole.Member)">Member</option>
+                            <option value="@ProgramRole.Manager" selected="@(pu.Role == ProgramRole.Manager)">Manager</option>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
+                    </form>
+                </td>
+                <td>@pu.AssignedAtUtc.ToString("yyyy-MM-dd")</td>
+                <td class="text-end">
+                    <form asp-action="RemoveMember" asp-route-id="@Model.Id" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="userSessionId" value="@pu.UserSessionId" />
+                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove this member?');">Remove</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a class="btn btn-secondary" asp-action="Details" asp-route-id="@Model.Id">Back to Program</a>

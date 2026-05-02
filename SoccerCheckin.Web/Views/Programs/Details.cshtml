@@ -1,0 +1,183 @@
+@model SoccerCheckin.Web.Models.Program
+@{
+    ViewData["Title"] = Model.Name;
+    var isAdmin = (bool)(ViewBag.IsAdmin ?? false);
+    var canManage = (bool)(ViewBag.CanManage ?? false);
+}
+
+@if (TempData["JoinSuccess"] is string joined)
+{
+    <div class="alert alert-success d-flex align-items-center gap-2">
+        <i class="bi bi-check-circle-fill"></i><span>@joined</span>
+    </div>
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
+    <div>
+        <h1 class="mb-1">@Model.Name</h1>
+        <p class="text-muted mb-0 small">
+            <i class="bi bi-calendar-plus me-1"></i>Created @Model.CreatedAtUtc.ToString("yyyy-MM-dd")
+            <span class="mx-1">·</span>
+            <i class="bi bi-arrow-repeat me-1"></i>Updated @Model.UpdatedAtUtc.ToString("yyyy-MM-dd")
+        </p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-outline-primary" asp-controller="Players" asp-action="Index" asp-route-programId="@Model.Id">
+            <i class="bi bi-person-badge me-1"></i>My Players
+        </a>
+        @if (canManage)
+        {
+            <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.Id">
+                <i class="bi bi-pencil me-1"></i>Edit Program
+            </a>
+            <a class="btn btn-info" asp-action="Members" asp-route-id="@Model.Id">
+                <i class="bi bi-people me-1"></i>Members
+            </a>
+            <a class="btn btn-outline-primary" asp-action="Invites" asp-route-id="@Model.Id">
+                <i class="bi bi-link-45deg me-1"></i>Invite Links
+            </a>
+            <a class="btn btn-success" asp-controller="Events" asp-action="Create" asp-route-programId="@Model.Id">
+                <i class="bi bi-plus-lg me-1"></i>New Event
+            </a>
+        }
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="sc-section mb-2"><i class="bi bi-info-circle text-success me-1"></i>Description</h5>
+        <p class="mb-0">@(string.IsNullOrWhiteSpace(Model.Description) ? "(none)" : Model.Description)</p>
+    </div>
+</div>
+
+<h4 class="sc-section"><i class="bi bi-calendar-event text-success me-1"></i>Events</h4>
+@{
+    var attendingCounts = (Dictionary<int, int>)(ViewBag.AttendingCounts ?? new Dictionary<int, int>());
+}
+@if (!Model.Events.Any())
+{
+    <div class="alert alert-info d-flex align-items-center gap-2">
+        <i class="bi bi-info-circle"></i><span>No events yet.</span>
+    </div>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr><th>Title</th><th>When</th><th>Location</th><th>Attending</th><th class="text-end">Actions</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var ev in Model.Events.OrderBy(e => e.StartUtc))
+            {
+                var count = attendingCounts.TryGetValue(ev.Id, out var c) ? c : 0;
+                <tr>
+                    <td class="fw-semibold">@ev.Title</td>
+                    <td>
+                        <i class="bi bi-clock text-muted me-1"></i>
+                        @ev.StartUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                    </td>
+                    <td class="text-muted">
+                        @if (!string.IsNullOrWhiteSpace(ev.Location))
+                        {
+                            <i class="bi bi-geo-alt me-1"></i>
+                        }
+                        @ev.Location
+                    </td>
+                    <td>
+                        <span class="badge bg-success">
+                            <i class="bi bi-people-fill me-1"></i>@count
+                        </span>
+                    </td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-secondary" asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id">
+                            <i class="bi bi-arrow-right"></i> Open
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@{
+    var summaryPlayers = (List<SoccerCheckin.Web.Models.Player>)(ViewBag.SummaryPlayers ?? new List<SoccerCheckin.Web.Models.Player>());
+    var attendingSet = (HashSet<(int EventId, int PlayerId)>)(ViewBag.AttendingSet ?? new HashSet<(int, int)>());
+    var orderedEvents = Model.Events.OrderBy(e => e.StartUtc).ToList();
+}
+@if (orderedEvents.Any() && summaryPlayers.Any())
+{
+    <h4 class="sc-section mt-4"><i class="bi bi-table text-success me-1"></i>Check-in Summary</h4>
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm align-middle text-center">
+            <thead>
+                <tr>
+                    <th class="text-start">Event</th>
+                    @foreach (var p in summaryPlayers)
+                    {
+                        <th>@p.Name</th>
+                    }
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ev in orderedEvents)
+                {
+                    var rowCount = 0;
+                    <tr>
+                        <td class="text-start">
+                            <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="fw-semibold">@ev.Title</a>
+                            <div class="text-muted small">@ev.StartUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</div>
+                        </td>
+                        @foreach (var p in summaryPlayers)
+                        {
+                            var attending = attendingSet.Contains((ev.Id, p.Id));
+                            if (attending) { rowCount++; }
+                            <td>
+                                @if (attending)
+                                {
+                                    <span class="text-success"><i class="bi bi-check-circle-fill"></i></span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">·</span>
+                                }
+                            </td>
+                        }
+                        <td><span class="badge bg-success">@rowCount</span></td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th class="text-start">Total</th>
+                    @{
+                        var grandTotal = 0;
+                    }
+                    @foreach (var p in summaryPlayers)
+                    {
+                        var col = orderedEvents.Count(e => attendingSet.Contains((e.Id, p.Id)));
+                        grandTotal += col;
+                        <th>@col</th>
+                    }
+                    <th><span class="badge bg-success">@grandTotal</span></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+}
+
+@if (isAdmin)
+{
+    <h5 class="sc-section mt-4"><i class="bi bi-people-fill text-success me-1"></i>Members (@Model.ProgramUsers.Count)</h5>
+    <ul class="list-group mb-3">
+        @foreach (var pu in Model.ProgramUsers)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-person-circle text-muted me-2"></i>@pu.UserSession.MicrosoftEmail</span>
+                <span class="badge bg-@(pu.Role == SoccerCheckin.Web.Models.ProgramRole.Manager ? "warning" : "secondary")">@pu.Role</span>
+            </li>
+        }
+    </ul>
+}
+
+<a class="btn btn-secondary" asp-action="Index"><i class="bi bi-arrow-left me-1"></i>Back</a>

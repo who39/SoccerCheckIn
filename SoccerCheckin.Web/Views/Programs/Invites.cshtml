@@ -1,0 +1,141 @@
+@model IEnumerable<SoccerCheckin.Web.Models.ProgramInvite>
+@using SoccerCheckin.Web.Models
+@{
+    var program = (SoccerCheckin.Web.Models.Program)ViewBag.Program;
+    ViewData["Title"] = $"Invites - {program.Name}";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div>
+        <h1 class="mb-1">Invite Links</h1>
+        <p class="text-muted small mb-0">
+            <i class="bi bi-trophy me-1"></i>
+            <a asp-action="Details" asp-route-id="@program.Id">@program.Name</a>
+        </p>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="sc-section mb-3"><i class="bi bi-link-45deg text-success me-1"></i>Generate New Invite Link</h5>
+        <form asp-action="CreateInvite" asp-route-id="@program.Id" method="post" class="row g-2 align-items-end">
+            @Html.AntiForgeryToken()
+            <div class="col-md-3">
+                <label class="form-label">Role</label>
+                <select name="role" class="form-select">
+                    <option value="@ProgramRole.Member" selected>Member</option>
+                    <option value="@ProgramRole.Manager">Manager</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Expires in (days)</label>
+                <input type="number" name="expireDays" value="14" min="1" max="365" class="form-control" />
+            </div>
+            <div class="col-md-auto">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-1"></i>Generate Link
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<h4 class="sc-section"><i class="bi bi-link text-success me-1"></i>Existing Invites</h4>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info d-flex align-items-center gap-2">
+        <i class="bi bi-info-circle"></i><span>No invite links yet. Generate one above.</span>
+    </div>
+}
+else
+{
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Link</th>
+                <th>Role</th>
+                <th>Expires</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var inv in Model)
+            {
+                var url = $"{Context.Request.Scheme}://{Context.Request.Host}/Programs/Join/{inv.Token}";
+                var isRevoked = inv.RevokedAtUtc.HasValue;
+                var isExpired = inv.ExpiresAtUtc.HasValue && inv.ExpiresAtUtc.Value < DateTime.UtcNow;
+                var isActive = !isRevoked && !isExpired;
+                <tr>
+                    <td style="max-width: 380px;">
+                        <div class="input-group input-group-sm">
+                            <input type="text" readonly class="form-control" value="@url" id="invite-@inv.Id" />
+                            <button class="btn btn-outline-secondary" type="button" onclick="copyInvite('@inv.Id')" title="Copy link">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-@(inv.RoleToGrant == ProgramRole.Manager ? "warning" : "secondary")">@inv.RoleToGrant</span>
+                    </td>
+                    <td class="small">
+                        @if (inv.ExpiresAtUtc.HasValue)
+                        {
+                            @inv.ExpiresAtUtc.Value.ToLocalTime().ToString("yyyy-MM-dd")
+                        }
+                        else
+                        {
+                            <span class="text-muted">Never</span>
+                        }
+                    </td>
+                    <td>
+                        @if (isRevoked)
+                        {
+                            <span class="badge bg-secondary"><i class="bi bi-x-circle me-1"></i>Revoked</span>
+                        }
+                        else if (isExpired)
+                        {
+                            <span class="badge bg-secondary"><i class="bi bi-clock-history me-1"></i>Expired</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Active</span>
+                        }
+                    </td>
+                    <td class="text-end">
+                        @if (isActive)
+                        {
+                            <form asp-action="RevokeInvite" asp-route-id="@program.Id" method="post" class="d-inline" onsubmit="return confirm('Revoke this invite?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="inviteId" value="@inv.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-x-circle me-1"></i>Revoke
+                                </button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<a class="btn btn-secondary" asp-action="Details" asp-route-id="@program.Id">
+    <i class="bi bi-arrow-left me-1"></i>Back to Program
+</a>
+
+@section Scripts {
+    <script>
+        function copyInvite(id) {
+            const el = document.getElementById('invite-' + id);
+            el.select();
+            navigator.clipboard.writeText(el.value).then(() => {
+                const btn = el.nextElementSibling;
+                const original = btn.innerHTML;
+                btn.innerHTML = '<i class="bi bi-check-lg"></i>';
+                setTimeout(() => { btn.innerHTML = original; }, 1500);
+            });
+        }
+    </script>
+}

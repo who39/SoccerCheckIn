@@ -1,0 +1,427 @@
+/* ========================================================================
+   Soccer Check-in — Clean & Sporty theme
+   ======================================================================== */
+
+:root {
+  --sc-green: #16a34a;
+  --sc-green-dark: #15803d;
+  --sc-green-soft: #dcfce7;
+  --sc-green-tint: #f0fdf4;
+  --sc-ink: #0f172a;
+  --sc-ink-soft: #1e293b;
+  --sc-muted: #64748b;
+  --sc-line: #e2e8f0;
+  --sc-bg: #f8fafc;
+  --sc-card: #ffffff;
+  --sc-amber: #f59e0b;
+  --sc-radius: 14px;
+  --sc-radius-sm: 10px;
+  --sc-shadow-sm: 0 1px 2px rgba(15, 23, 42, .04), 0 1px 3px rgba(15, 23, 42, .06);
+  --sc-shadow-md: 0 4px 6px -1px rgba(15, 23, 42, .06), 0 2px 4px -2px rgba(15, 23, 42, .06);
+  --sc-shadow-lg: 0 10px 25px -5px rgba(15, 23, 42, .10), 0 8px 10px -6px rgba(15, 23, 42, .05);
+
+  /* Override Bootstrap */
+  --bs-primary: var(--sc-green);
+  --bs-primary-rgb: 22, 163, 74;
+  --bs-link-color: var(--sc-green-dark);
+  --bs-link-hover-color: var(--sc-green);
+  --bs-body-color: var(--sc-ink);
+  --bs-body-bg: var(--sc-bg);
+}
+
+/* ----- Typography ----- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+html { font-size: 15px; }
+@media (min-width: 768px) { html { font-size: 16px; } }
+
+html, body { height: auto; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--sc-bg);
+  color: var(--sc-ink);
+  margin: 0;
+  min-height: 100vh;
+  /* Sticky-footer technique using grid: header auto, main 1fr (grows), footer auto */
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+main {
+  /* let it size to its contents; the grid 1fr row handles vertical distribution */
+  min-width: 0;
+}
+
+footer.footer {
+  /* normal flow inside the grid auto row */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--sc-ink);
+}
+
+.display-5, .display-6 {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.lead {
+  color: var(--sc-muted);
+  font-weight: 400;
+}
+
+.text-muted, .text-secondary { color: var(--sc-muted) !important; }
+
+/* ----- Navbar ----- */
+.navbar {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--sc-line) !important;
+  box-shadow: none !important;
+  padding-top: .65rem;
+  padding-bottom: .65rem;
+}
+
+.navbar-brand {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--sc-ink) !important;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.navbar-brand::before {
+  content: "⚽";
+  font-size: 1.25rem;
+}
+
+.nav-link {
+  font-weight: 500;
+  color: var(--sc-ink-soft) !important;
+  border-radius: 8px;
+  padding: .35rem .75rem !important;
+  margin: 0 .15rem;
+  transition: background .15s ease, color .15s ease;
+}
+
+.nav-link:hover {
+  background: var(--sc-green-tint);
+  color: var(--sc-green-dark) !important;
+}
+
+.dropdown-menu {
+  border: 1px solid var(--sc-line);
+  border-radius: var(--sc-radius-sm);
+  box-shadow: var(--sc-shadow-lg);
+  padding: .35rem;
+}
+
+.dropdown-item {
+  border-radius: 8px;
+  padding: .45rem .75rem;
+  font-weight: 500;
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+  background: var(--sc-green-tint);
+  color: var(--sc-green-dark);
+}
+
+/* ----- Container ----- */
+.container {
+  max-width: 1140px;
+}
+
+/* ----- Buttons ----- */
+.btn {
+  font-weight: 600;
+  border-radius: var(--sc-radius-sm);
+  padding: .5rem 1rem;
+  letter-spacing: -0.01em;
+  border-width: 1px;
+  transition: transform .08s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-sm {
+  padding: .3rem .65rem;
+  font-size: .85rem;
+  border-radius: 8px;
+}
+
+.btn-primary {
+  background: var(--sc-green);
+  border-color: var(--sc-green);
+  color: #fff;
+  box-shadow: var(--sc-shadow-sm);
+}
+.btn-primary:hover, .btn-primary:focus {
+  background: var(--sc-green-dark);
+  border-color: var(--sc-green-dark);
+  color: #fff;
+  box-shadow: var(--sc-shadow-md);
+}
+
+.btn-outline-primary {
+  color: var(--sc-green-dark);
+  border-color: var(--sc-green);
+}
+.btn-outline-primary:hover, .btn-outline-primary:focus {
+  background: var(--sc-green);
+  border-color: var(--sc-green);
+  color: #fff;
+}
+
+.btn-secondary, .btn-outline-secondary {
+  border-color: var(--sc-line);
+  background: #fff;
+  color: var(--sc-ink-soft);
+}
+.btn-secondary:hover, .btn-outline-secondary:hover,
+.btn-secondary:focus, .btn-outline-secondary:focus {
+  background: #f1f5f9;
+  color: var(--sc-ink);
+  border-color: #cbd5e1;
+}
+
+.btn-success { background: var(--sc-green); border-color: var(--sc-green); }
+.btn-success:hover, .btn-success:focus { background: var(--sc-green-dark); border-color: var(--sc-green-dark); }
+
+.btn-info {
+  background: #0ea5e9;
+  border-color: #0ea5e9;
+  color: #fff;
+}
+.btn-info:hover, .btn-info:focus { background: #0284c7; border-color: #0284c7; color: #fff; }
+
+.btn-outline-info {
+  color: #0284c7;
+  border-color: #7dd3fc;
+}
+.btn-outline-info:hover, .btn-outline-info:focus {
+  background: #0ea5e9; border-color: #0ea5e9; color: #fff;
+}
+
+.btn-danger, .btn-outline-danger { /* keep visible but soften */ }
+.btn-outline-danger {
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+.btn-outline-danger:hover, .btn-outline-danger:focus {
+  background: #dc2626; border-color: #dc2626; color: #fff;
+}
+
+.btn:focus, .btn:active:focus,
+.btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 .2rem rgba(22, 163, 74, .25);
+}
+
+/* ----- Cards ----- */
+.card,
+.list-group {
+  border: 1px solid var(--sc-line);
+  border-radius: var(--sc-radius);
+  box-shadow: var(--sc-shadow-sm);
+  background: var(--sc-card);
+}
+
+.list-group-item {
+  border-color: var(--sc-line);
+  padding: .8rem 1rem;
+}
+
+/* ----- Forms ----- */
+.form-control, .form-select {
+  border: 1px solid var(--sc-line);
+  border-radius: var(--sc-radius-sm);
+  padding: .55rem .8rem;
+  background: #fff;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--sc-green);
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, .12);
+}
+
+.form-label {
+  font-weight: 600;
+  color: var(--sc-ink);
+  margin-bottom: .35rem;
+  font-size: .9rem;
+}
+
+.form-text {
+  color: var(--sc-muted);
+}
+
+/* ----- Tables ----- */
+.table {
+  --bs-table-bg: transparent;
+  background: var(--sc-card);
+  border: 1px solid var(--sc-line);
+  border-radius: var(--sc-radius);
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--sc-shadow-sm);
+}
+
+.table > :not(caption) > * > * {
+  padding: .85rem 1rem;
+}
+
+.table > thead {
+  background: #f8fafc;
+}
+
+.table > thead th {
+  font-weight: 600;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--sc-muted);
+  border-bottom: 1px solid var(--sc-line);
+  background: #f8fafc;
+}
+
+.table > tbody > tr {
+  transition: background .15s ease;
+}
+
+.table-hover > tbody > tr:hover > * {
+  background: var(--sc-green-tint);
+}
+
+.table > tbody > tr > td {
+  border-bottom: 1px solid var(--sc-line);
+  vertical-align: middle;
+}
+.table > tbody > tr:last-child > td { border-bottom: none; }
+
+.table-bordered, .table-bordered > :not(caption) > * {
+  border-color: var(--sc-line);
+}
+
+/* Summary table tweaks */
+.table.table-sm > :not(caption) > * > * { padding: .45rem .55rem; }
+
+/* ----- Badges ----- */
+.badge {
+  font-weight: 600;
+  letter-spacing: .02em;
+  padding: .35em .6em;
+  border-radius: 999px;
+}
+
+.badge.bg-warning { background: #fef3c7 !important; color: #92400e !important; }
+.badge.bg-success { background: var(--sc-green-soft) !important; color: var(--sc-green-dark) !important; }
+.badge.bg-secondary { background: #e2e8f0 !important; color: var(--sc-ink-soft) !important; }
+.badge.bg-light { background: #f1f5f9 !important; color: var(--sc-muted) !important; }
+
+/* ----- Alerts ----- */
+.alert {
+  border: 1px solid transparent;
+  border-radius: var(--sc-radius);
+  padding: 1rem 1.1rem;
+}
+
+.alert-info {
+  background: #eff6ff;
+  color: #1e40af;
+  border-color: #bfdbfe;
+}
+
+.alert-danger {
+  background: #fef2f2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+
+/* ----- Hero band on Programs/Index ----- */
+.sc-hero {
+  background:
+    radial-gradient(60% 80% at 80% 20%, rgba(22, 163, 74, .12), transparent 60%),
+    radial-gradient(50% 70% at 10% 90%, rgba(34, 197, 94, .10), transparent 60%),
+    linear-gradient(180deg, #ffffff 0%, var(--sc-green-tint) 100%);
+  border: 1px solid var(--sc-line);
+  border-radius: 20px;
+  padding: 2.25rem 1.5rem;
+  margin-bottom: 1.75rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.sc-hero h1 {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.sc-hero .lead {
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+.sc-hero::before {
+  content: "⚽";
+  position: absolute;
+  font-size: 7rem;
+  right: -1.5rem;
+  bottom: -2rem;
+  opacity: .08;
+  transform: rotate(-15deg);
+  pointer-events: none;
+}
+
+/* ----- Footer ----- */
+.footer {
+  position: static !important;
+  border-top: 1px solid var(--sc-line) !important;
+  background: #fff;
+  padding: 1rem 0;
+  color: var(--sc-muted);
+  font-size: .875rem;
+  margin-top: 2rem;
+  width: 100%;
+}
+
+/* ----- Iframes (maps) ----- */
+iframe {
+  border-radius: var(--sc-radius);
+  box-shadow: var(--sc-shadow-md);
+}
+
+/* ----- Misc ----- */
+hr, .border-bottom { border-color: var(--sc-line) !important; }
+
+a { color: var(--sc-green-dark); text-decoration: none; }
+a:hover { color: var(--sc-green); text-decoration: underline; }
+
+dl.row dt { color: var(--sc-muted); font-weight: 600; }
+dl.row dd { color: var(--sc-ink); margin-bottom: .5rem; }
+
+/* Small visual: section headings get a green accent bar */
+h4.sc-section, h5.sc-section {
+  position: relative;
+  padding-left: .85rem;
+  margin-top: 1.5rem;
+}
+h4.sc-section::before, h5.sc-section::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: .25em;
+  bottom: .25em;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--sc-green);
+}

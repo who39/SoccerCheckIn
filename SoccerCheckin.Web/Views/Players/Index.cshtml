@@ -1,0 +1,37 @@
+@model IEnumerable<SoccerCheckin.Web.Models.Player>
+@{
+    var program = (SoccerCheckin.Web.Models.Program)ViewBag.Program;
+    ViewData["Title"] = $"My Players - {program.Name}";
+}
+<h1>My Players in @program.Name</h1>
+
+<a class="btn btn-primary mb-3" asp-action="Create" asp-route-programId="@program.Id">+ Add Player</a>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">You haven't added any players yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead><tr><th>Name</th><th>Notes</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td>@p.Name</td>
+                    <td>@p.Notes</td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@p.Id">Edit</a>
+                        <form asp-action="Delete" asp-route-id="@p.Id" method="post" class="d-inline" onsubmit="return confirm('Delete this player?');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<a class="btn btn-secondary" asp-controller="Programs" asp-action="Details" asp-route-id="@program.Id">Back to Program</a>
