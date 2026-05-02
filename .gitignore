@@ -1,0 +1,20 @@
+# Build output
+bin/
+obj/
+publish/
+
+# User/IDE files
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Logs
+*.log
+
+# Local AI/tooling folders
+.claude/
+.clude/
+
+# ASP.NET Core local secrets/config
+appsettings.Development.json
