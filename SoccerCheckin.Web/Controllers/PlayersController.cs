@@ -10,7 +10,7 @@ namespace SoccerCheckin.Web.Controllers;
 [Authorize]
 public class PlayersController(AppDbContext dbContext, ICurrentUserService currentUser) : Controller
 {
-    /// <summary>List the current user's own players inside a program.</summary>
+    /// <summary>List players the current user can manage in this program (family's players + legacy owned players).</summary>
     [HttpGet]
     public async Task<IActionResult> Index(int programId)
     {
@@ -21,10 +21,13 @@ public class PlayersController(AppDbContext dbContext, ICurrentUserService curre
         var program = await dbContext.Programs.FindAsync(programId);
         if (program == null) return NotFound();
 
-        var players = await dbContext.Players
-            .Where(p => p.ProgramId == programId && p.OwnerUserSessionId == me.Id)
-            .OrderBy(p => p.Name)
-            .ToListAsync();
+        var family = await currentUser.GetFamilyAsync();
+        var query = dbContext.Players.Where(p => p.ProgramId == programId);
+        query = family != null
+            ? query.Where(p => p.FamilyId == family.Id || (p.FamilyId == null && p.OwnerUserSessionId == me.Id))
+            : query.Where(p => p.OwnerUserSessionId == me.Id);
+
+        var players = await query.OrderBy(p => p.Name).ToListAsync();
 
         ViewBag.Program = program;
         return View(players);
@@ -49,13 +52,16 @@ public class PlayersController(AppDbContext dbContext, ICurrentUserService curre
         if (me == null) return Forbid();
         ModelState.Remove(nameof(Player.Program));
         ModelState.Remove(nameof(Player.OwnerUserSession));
+        ModelState.Remove(nameof(Player.Family));
         if (!ModelState.IsValid)
         {
             ViewBag.Program = await dbContext.Programs.FindAsync(input.ProgramId);
             return View(input);
         }
 
+        var family = await currentUser.GetFamilyAsync();
         input.OwnerUserSessionId = me.Id;
+        input.FamilyId = family?.Id;
         input.CreatedAtUtc = DateTime.UtcNow;
         dbContext.Players.Add(input);
         await dbContext.SaveChangesAsync();
@@ -67,9 +73,7 @@ public class PlayersController(AppDbContext dbContext, ICurrentUserService curre
     {
         var player = await dbContext.Players.FindAsync(id);
         if (player == null) return NotFound();
-        var me = await currentUser.GetUserAsync();
-        var canManage = await currentUser.CanManageProgramAsync(player.ProgramId);
-        if (!canManage && (me == null || player.OwnerUserSessionId != me.Id)) return Forbid();
+        if (!await CanManagePlayerAsync(player)) return Forbid();
         ViewBag.Program = await dbContext.Programs.FindAsync(player.ProgramId);
         return View(player);
     }
@@ -81,11 +85,10 @@ public class PlayersController(AppDbContext dbContext, ICurrentUserService curre
         if (id != input.Id) return BadRequest();
         var player = await dbContext.Players.FindAsync(id);
         if (player == null) return NotFound();
-        var me = await currentUser.GetUserAsync();
-        var canManage = await currentUser.CanManageProgramAsync(player.ProgramId);
-        if (!canManage && (me == null || player.OwnerUserSessionId != me.Id)) return Forbid();
+        if (!await CanManagePlayerAsync(player)) return Forbid();
         ModelState.Remove(nameof(Player.Program));
         ModelState.Remove(nameof(Player.OwnerUserSession));
+        ModelState.Remove(nameof(Player.Family));
         if (!ModelState.IsValid)
         {
             ViewBag.Program = await dbContext.Programs.FindAsync(player.ProgramId);
@@ -104,13 +107,18 @@ public class PlayersController(AppDbContext dbContext, ICurrentUserService curre
     {
         var player = await dbContext.Players.FindAsync(id);
         if (player == null) return NotFound();
-        var me = await currentUser.GetUserAsync();
-        var canManage = await currentUser.CanManageProgramAsync(player.ProgramId);
-        if (!canManage && (me == null || player.OwnerUserSessionId != me.Id)) return Forbid();
+        if (!await CanManagePlayerAsync(player)) return Forbid();
 
         var programId = player.ProgramId;
         dbContext.Players.Remove(player);
         await dbContext.SaveChangesAsync();
         return RedirectToAction(nameof(Index), new { programId });
+    }
+
+    /// <summary>Edit/delete authorization: program manager, OR family member of the player, OR (legacy) owner.</summary>
+    private async Task<bool> CanManagePlayerAsync(Player player)
+    {
+        if (await currentUser.CanManageProgramAsync(player.ProgramId)) return true;
+        return await currentUser.CanCheckInPlayerAsync(player);
     }
 }

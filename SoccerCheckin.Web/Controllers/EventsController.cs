@@ -22,11 +22,14 @@ public class EventsController(AppDbContext dbContext, ICurrentUserService curren
         if (!await currentUser.HasProgramAccessAsync(ev.ProgramId)) return Forbid();
 
         var me = await currentUser.GetUserAsync();
+        var family = await currentUser.GetFamilyAsync();
         var myPlayers = me == null
             ? new List<Player>()
-            : await dbContext.Players
-                .Where(p => p.ProgramId == ev.ProgramId && p.OwnerUserSessionId == me.Id)
-                .ToListAsync();
+            : await (family != null
+                ? dbContext.Players.Where(p => p.ProgramId == ev.ProgramId
+                    && (p.FamilyId == family.Id || (p.FamilyId == null && p.OwnerUserSessionId == me.Id)))
+                : dbContext.Players.Where(p => p.ProgramId == ev.ProgramId && p.OwnerUserSessionId == me.Id))
+              .ToListAsync();
 
         ViewBag.MyPlayers = myPlayers;
         ViewBag.MyAttendance = ev.Attendances
@@ -109,7 +112,7 @@ public class EventsController(AppDbContext dbContext, ICurrentUserService curren
         return RedirectToAction("Details", "Programs", new { id = programId });
     }
 
-    /// <summary>Toggle/set a single player's attendance for this event. The user must own the player.</summary>
+    /// <summary>Toggle/set a single player's attendance for this event. The user must own the player or be in its family.</summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> SetAttendance(int id, int playerId, bool isAttending)
@@ -121,9 +124,7 @@ public class EventsController(AppDbContext dbContext, ICurrentUserService curren
         if (player == null) return NotFound();
         if (player.ProgramId != ev.ProgramId) return BadRequest();
 
-        var me = await currentUser.GetUserAsync();
-        var canManage = await currentUser.CanManageProgramAsync(ev.ProgramId);
-        if (!canManage && (me == null || player.OwnerUserSessionId != me.Id)) return Forbid();
+        if (!await currentUser.CanCheckInPlayerAsync(player)) return Forbid();
 
         var attendance = await dbContext.Attendances
             .FirstOrDefaultAsync(a => a.EventId == id && a.PlayerId == playerId);
@@ -159,9 +160,7 @@ public class EventsController(AppDbContext dbContext, ICurrentUserService curren
         if (player == null) return NotFound();
         if (player.ProgramId != ev.ProgramId) return BadRequest();
 
-        var me = await currentUser.GetUserAsync();
-        var canManage = await currentUser.CanManageProgramAsync(ev.ProgramId);
-        if (!canManage && (me == null || player.OwnerUserSessionId != me.Id)) return Forbid();
+        if (!await currentUser.CanCheckInPlayerAsync(player)) return Forbid();
 
         var attendance = await dbContext.Attendances
             .FirstOrDefaultAsync(a => a.EventId == id && a.PlayerId == playerId);

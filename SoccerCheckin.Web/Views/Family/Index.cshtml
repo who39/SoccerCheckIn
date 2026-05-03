@@ -1,0 +1,109 @@
+@model SoccerCheckin.Web.Models.Family
+@{
+    ViewData["Title"] = $"Family - {Model.Name}";
+    var isHead = (bool)(ViewBag.IsHead ?? false);
+    var meId = (int)(ViewBag.MeId ?? 0);
+    var pendingInvites = Model.Invites.Where(i => i.AcceptedAtUtc == null && i.RevokedAtUtc == null && i.ExpiresAtUtc > DateTime.UtcNow).ToList();
+}
+
+@if (TempData["Success"] is string s) { <div class="alert alert-success">@s</div> }
+@if (TempData["Error"] is string e) { <div class="alert alert-danger">@e</div> }
+
+<h1>@Model.Name <small class="text-muted">family</small></h1>
+<p class="text-muted">
+    Head: <strong>@(Model.Head.MicrosoftDisplayName ?? Model.Head.MicrosoftEmail)</strong>
+    &middot; @Model.Members.Count member(s) &middot; @Model.Players.Count player(s)
+</p>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header">Members</div>
+            <ul class="list-group list-group-flush">
+                @foreach (var m in Model.Members.OrderBy(x => x.JoinedAtUtc))
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            @(m.UserSession.MicrosoftDisplayName ?? m.UserSession.MicrosoftEmail)
+                            @if (m.UserSessionId == Model.HeadUserSessionId) { <span class="badge bg-warning text-dark ms-1">Head</span> }
+                            @if (m.UserSessionId == meId) { <span class="badge bg-secondary ms-1">You</span> }
+                        </div>
+                        @if (isHead && m.UserSessionId != Model.HeadUserSessionId)
+                        {
+                            <form asp-action="RemoveMember" asp-route-userSessionId="@m.UserSessionId" method="post" onsubmit="return confirm('Remove this member?');">
+                                @Html.AntiForgeryToken()
+                                <button class="btn btn-sm btn-outline-danger">Remove</button>
+                            </form>
+                        }
+                    </li>
+                }
+            </ul>
+        </div>
+
+        @if (isHead)
+        {
+            <div class="card mb-3">
+                <div class="card-header">Add member by email</div>
+                <div class="card-body">
+                    <form asp-action="AddMember" method="post" class="row g-2">
+                        @Html.AntiForgeryToken()
+                        <div class="col-sm-8"><input type="email" name="email" class="form-control" placeholder="person@example.com" required /></div>
+                        <div class="col-sm-4 d-grid"><button class="btn btn-primary">Add</button></div>
+                    </form>
+                    <small class="text-muted">If they already have an account, they're added immediately. Otherwise we'll create an invite link.</small>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-md-6">
+        @if (isHead)
+        {
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Invite link</span>
+                    <form asp-action="CreateInvite" method="post">
+                        @Html.AntiForgeryToken()
+                        <button class="btn btn-sm btn-success">+ New invite</button>
+                    </form>
+                </div>
+                @if (!pendingInvites.Any())
+                {
+                    <div class="card-body text-muted">No active invites.</div>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var i in pendingInvites)
+                        {
+                            var url = Url.Action("Join", "Family", new { token = i.Token }, Context.Request.Scheme);
+                            <li class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1 me-2">
+                                        @if (i.Email != null) { <div><strong>For:</strong> @i.Email</div> }
+                                        <div class="small text-muted">Expires @i.ExpiresAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</div>
+                                        <input type="text" class="form-control form-control-sm mt-1" value="@url" readonly onclick="this.select();" />
+                                    </div>
+                                    <form asp-action="RevokeInvite" asp-route-id="@i.Id" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <button class="btn btn-sm btn-outline-danger">Revoke</button>
+                                    </form>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+
+            <div class="card border-danger mb-3">
+                <div class="card-header text-danger">Danger zone</div>
+                <div class="card-body">
+                    <form asp-action="Delete" method="post" onsubmit="return confirm('Delete this family? Players will remain but be detached.');">
+                        @Html.AntiForgeryToken()
+                        <button class="btn btn-outline-danger">Delete family</button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+</div>

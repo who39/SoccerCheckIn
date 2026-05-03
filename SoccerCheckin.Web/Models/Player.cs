@@ -9,9 +9,14 @@ public class Player
     public int ProgramId { get; set; }
     public Program Program { get; set; } = null!;
 
-    // Owning user (the user who created/owns this player; can manage attendance for them)
+    // Owning user (the user who created/registered this player; kept for audit/legacy auth fallback)
     public int OwnerUserSessionId { get; set; }
     public UserSession OwnerUserSession { get; set; } = null!;
+
+    // Family that owns this player. Any family member can check the player in/out.
+    // Nullable so existing players (created before the family feature) keep working.
+    public int? FamilyId { get; set; }
+    public Family? Family { get; set; }
 
     [Required]
     [StringLength(100)]

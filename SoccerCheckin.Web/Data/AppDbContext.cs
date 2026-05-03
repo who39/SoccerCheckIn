@@ -12,6 +12,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Player> Players => Set<Player>();
     public DbSet<Attendance> Attendances => Set<Attendance>();
     public DbSet<ProgramInvite> ProgramInvites => Set<ProgramInvite>();
+    public DbSet<Family> Families => Set<Family>();
+    public DbSet<FamilyMember> FamilyMembers => Set<FamilyMember>();
+    public DbSet<FamilyInvite> FamilyInvites => Set<FamilyInvite>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -81,5 +84,47 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .WithMany()
             .HasForeignKey(i => i.ProgramId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // ---- Family ----
+        modelBuilder.Entity<Family>()
+            .HasOne(f => f.Head)
+            .WithMany()
+            .HasForeignKey(f => f.HeadUserSessionId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<FamilyMember>()
+            .HasIndex(m => m.UserSessionId)
+            .IsUnique();
+
+        modelBuilder.Entity<FamilyMember>()
+            .HasOne(m => m.Family)
+            .WithMany(f => f.Members)
+            .HasForeignKey(m => m.FamilyId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<FamilyMember>()
+            .HasOne(m => m.UserSession)
+            .WithOne(u => u.FamilyMember!)
+            .HasForeignKey<FamilyMember>(m => m.UserSessionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<FamilyInvite>()
+            .HasIndex(i => i.Token)
+            .IsUnique();
+
+        modelBuilder.Entity<FamilyInvite>()
+            .HasOne(i => i.Family)
+            .WithMany(f => f.Invites)
+            .HasForeignKey(i => i.FamilyId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Player>()
+            .HasOne(p => p.Family)
+            .WithMany(f => f.Players)
+            .HasForeignKey(p => p.FamilyId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<Player>()
+            .HasIndex(p => p.FamilyId);
     }
 }

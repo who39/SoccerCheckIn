@@ -28,4 +28,7 @@ public class UserSession
     public DateTime LastLoginUtc { get; set; }
 
     public ICollection<ProgramUser> ProgramUsers { get; set; } = new List<ProgramUser>();
+
+    /// <summary>The family this user belongs to (if any). Each user can be in at most one family.</summary>
+    public FamilyMember? FamilyMember { get; set; }
 }
