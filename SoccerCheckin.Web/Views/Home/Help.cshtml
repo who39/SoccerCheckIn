@@ -1,0 +1,171 @@
+@{
+    ViewData["Title"] = "Help";
+}
+
+<div class="row">
+    <div class="col-lg-3 mb-3">
+        <div class="list-group sticky-top" style="top:80px;">
+            <a class="list-group-item list-group-item-action" href="#signin">Sign in</a>
+            <a class="list-group-item list-group-item-action" href="#programs">Programs</a>
+            <a class="list-group-item list-group-item-action" href="#players">Players</a>
+            <a class="list-group-item list-group-item-action" href="#family">Family sharing</a>
+            <a class="list-group-item list-group-item-action" href="#checkin">Checking in</a>
+            <a class="list-group-item list-group-item-action" href="#faq">FAQ</a>
+        </div>
+    </div>
+
+    <div class="col-lg-9">
+        <h1><i class="bi bi-question-circle me-2"></i>Help &amp; Getting Started</h1>
+        <p class="lead">Welcome! This page walks you through what you can do in Soccer Check-in. No tech background needed — just follow the steps.</p>
+
+        <hr />
+
+        <h2 id="signin"><i class="bi bi-box-arrow-in-right me-2"></i>Sign in</h2>
+        <ol>
+            <li>Go to the site URL your coach shared with you.</li>
+            <li>Click <strong>Login</strong> in the top-right corner.</li>
+            <li>Pick the Microsoft account you want to use. Use the <em>same one every time</em> so the app recognises you.</li>
+        </ol>
+        <div class="alert alert-info">
+            <i class="bi bi-lightbulb me-1"></i> Tell your coach which email address you'll log in with — that's the one they'll use to invite you to a program.
+        </div>
+
+        <hr />
+
+        <h2 id="programs"><i class="bi bi-trophy me-2"></i>Programs</h2>
+        <p>A <strong>Program</strong> is your team or season — for example, "Spring U10 Lions".</p>
+        <ul>
+            <li>Click <strong>Programs</strong> in the menu to see every program you belong to.</li>
+            <li>Click a program name to see its <strong>events</strong> (practices, games) and <strong>roster</strong>.</li>
+        </ul>
+        <p>If you don't see your program listed, ask your coach for an invite link or to add you by email.</p>
+
+        <hr />
+
+        <h2 id="players"><i class="bi bi-person-badge me-2"></i>Players (your kids)</h2>
+        <ul>
+            <li>From a program page, click <strong>Players</strong> to see the kids you can check in for.</li>
+            <li>Click <strong>+ Add Player</strong> to register your child. Enter their name and any notes (e.g. "shin-guards in red bag").</li>
+            <li>You can <strong>Edit</strong> or <strong>Delete</strong> a player at any time.</li>
+        </ul>
+        <div class="alert alert-secondary">
+            A player belongs to one program. If your child is in two programs, add them once in each.
+        </div>
+
+        <hr />
+
+        <h2 id="family"><i class="bi bi-people-fill me-2"></i>Family — share check-in with another parent</h2>
+        <p>This is what you use when <strong>both parents</strong> (or a parent and a grandparent, or a babysitter) need to drop the kid off and check them in.</p>
+
+        <h4>What is a family?</h4>
+        <p>A <strong>family</strong> is a small group of users who share the same kids. Anyone in the family can check those kids in or out for any event. One person — the <strong>family head</strong> — manages who's in the family.</p>
+
+        <h4>1. Create your family (one-time)</h4>
+        <ol>
+            <li>Click <strong>Family</strong> in the menu.</li>
+            <li>Type a name (usually your last name, e.g. "Smith") and click <strong>Create family</strong>.</li>
+        </ol>
+        <p>You're now the family head, and any players you've already added are automatically attached to the family.</p>
+
+        <h4>2. Add another parent or guardian</h4>
+        <p>You have two options on the Family page:</p>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Option A — by email</h5>
+                        <p>Type the other person's email and click <strong>Add</strong>.</p>
+                        <ul>
+                            <li>If they've already signed in to the app, they're added immediately.</li>
+                            <li>If not, the app creates an <strong>invite link</strong> for you to share by text or email.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Option B — invite link</h5>
+                        <p>Click <strong>+ New invite</strong> to generate a shareable link.</p>
+                        <p>Send it to anyone you want to add. The first person who signs in and opens the link joins your family.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="alert alert-warning mt-3">
+            <i class="bi bi-clock me-1"></i> Invites expire after <strong>14 days</strong>. You can revoke any pending invite at any time.
+        </div>
+
+        <h4 class="mt-3">3. Joining a family someone sent you</h4>
+        <ol>
+            <li>Click the invite link they shared.</li>
+            <li>Sign in with your Microsoft account if asked.</li>
+            <li>You're in! You'll now see all of that family's players in <strong>Players</strong> and on event pages.</li>
+        </ol>
+
+        <h4>Removing a member or deleting the family</h4>
+        <ul>
+            <li>The <strong>head</strong> can remove anyone (except themselves) from the Family page.</li>
+            <li>Only the head can delete the family. Players stay in the system but are no longer shared.</li>
+        </ul>
+        <div class="alert alert-info">
+            You can only be in <strong>one family at a time</strong>. To switch, leave or delete the current one first.
+        </div>
+
+        <hr />
+
+        <h2 id="checkin"><i class="bi bi-check2-square me-2"></i>Check in for an event</h2>
+        <ol>
+            <li>Click <strong>Programs</strong> → pick your program → click an event.</li>
+            <li>For each player, click <strong>Going</strong> or <strong>Not going</strong>.</li>
+            <li>To change your mind, click again or use <strong>Reset</strong>.</li>
+        </ol>
+        <p>Anyone in the family — head or member — can check in any of the family's players. Your selection is saved instantly; no submit button needed.</p>
+
+        <hr />
+
+        <h2 id="faq"><i class="bi bi-chat-dots me-2"></i>Frequently asked questions</h2>
+
+        <div class="accordion" id="faqAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">I added my partner by email but it says "no account found."</button></h2>
+                <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">The app needs them to sign in once first. Either ask them to sign in and try again, or send them the invite link the app generated for you — that link works even before they have an account.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">My kid plays in two programs. Do I need two families?</button></h2>
+                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">No. Family is global — one family covers all programs. As long as the player is registered in each program, anyone in the family can check them in for either program's events.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">I checked the wrong button.</button></h2>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">Just click the right one, or click <strong>Reset</strong> to clear your selection. The latest click wins.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">I want someone to help check kids in but not manage the roster.</button></h2>
+                <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">Add them as a family member. Members can check in but can't add or remove other members — only the head can.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">I'm not seeing the Family menu.</button></h2>
+                <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">You need to be signed in. If you are signed in and still don't see it, refresh the page.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">I lost the invite link I created.</button></h2>
+                <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">Open the <strong>Family</strong> page — your active invites are listed there. Copy the link, or revoke and create a new one.</div>
+                </div>
+            </div>
+        </div>
+
+        <hr class="mt-4" />
+        <p class="text-muted">Still stuck? Reach out to your program coach or admin — they can check your account setup and re-send invites.</p>
+    </div>
+</div>
