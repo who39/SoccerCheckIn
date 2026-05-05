@@ -4,6 +4,9 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- TEMPORARY: forces ASPNETCORE_ENVIRONMENT=Development in published web.config so
+         Azure App Service shows full exception details. REMOVE before going live. -->
+    <EnvironmentName>Development</EnvironmentName>
   </PropertyGroup>
 
   <ItemGroup>
